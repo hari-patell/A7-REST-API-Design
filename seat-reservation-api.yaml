@@ -1,0 +1,90 @@
+openapi: 3.0.3
+info:
+  title: Seat Reservation API
+  version: 1.0.0
+  description: >
+    Lets the customer (client) reserve seats for a movie showtime. The server
+    holds the seats so no one else can take them while the customer pays. The customer
+    can also look up or cancel a reservation.
+
+paths:
+  /reservations:
+    post:
+      summary: Reserve seats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                showtimeId:
+                  type: string
+                seatNumbers:
+                  type: array
+                  items:
+                    type: string
+                ticketTypes:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Seats reserved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservationId:
+                    type: string
+                  totalPrice:
+                    type: number
+        '409':
+          description: Seats are already taken
+
+  /reservations/{reservationId}:
+    get:
+      summary: Get a reservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reservation found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservationId:
+                    type: string
+                  showtimeId:
+                    type: string
+                  seatNumbers:
+                    type: array
+                    items:
+                      type: string
+                  totalPrice:
+                    type: number
+        '404':
+          description: Reservation not found
+
+    delete:
+      summary: Cancel a reservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Reservation cancelled
+        '404':
+          description: Reservation not found
+        '409':
+          description: Reservation already paid and cannot be cancelled
